@@ -20,7 +20,7 @@ print(my_pv_curve)
 my_pv_curve.plot()
 ```
 
-![Example output of my_pv_curve.plot()](https://github.com/jean-allen/pvcurve/tests/output_img.png)
+![Example output of my_pv_curve.plot()](https://github.com/jean-allen/pvcurve/blob/main/tests/output_img.png?raw=true)
 
 Some example data is available under tests/eugl_1.xlsx, plus a notebook (reading_in_file.ipynb) that shows the same use cases seen here in a bit of a more interactive way.
 
