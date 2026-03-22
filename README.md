@@ -64,7 +64,7 @@ The breakpoint for pre-TLP and post-TLP is detected automatically based on the w
 ```python
 breakpoint = my_pv_curve.get_breakpoint(plot=True)
 ```
-![Example output of my_pv_curve.get_breakpoint(plot=True)](https://github.com/jean-allen/pvcurve/tests/breakpoint.png)
+![Example output of my_pv_curve.get_breakpoint(plot=True)](https://github.com/jean-allen/pvcurve/blob/main/tests/breakpoint.png?raw=true)
 
 
 I've been thinking about experimenting with other breakpoint detection algorithms so let me know if there's something you think I should try!
