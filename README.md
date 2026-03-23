@@ -1,6 +1,6 @@
 # pvcurve
 
-[![PyPI version](https://badge.fury.io/py/pvcurve.svg)](https://pypi.org/project/pvcurve/)
+[![PyPI version](https://badge.fury.io/py/pvcurve.svg)](https://pypi.org/project/pvcurve/)[![DOI](https://zenodo.org/badge/878741123.svg)](https://doi.org/10.5281/zenodo.19172919)
 
 A lightweight python package for analyzing pressure-volume curves. `pvcurve` provides a simple, fast way to calculate common PV curve metrics (e.g., turgor loss point, capacitance, osmotic potential) with automated turgor loss detection, built-in plotting, and optional outlier detection.
 
