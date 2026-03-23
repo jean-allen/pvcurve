@@ -2,11 +2,19 @@
 
 [![PyPI version](https://badge.fury.io/py/pvcurve.svg)](https://pypi.org/project/pvcurve/)
 
-A lightweight python package for analyzing pressure-volume curves. This package provides a simple and fast way to calculate common PV curve metrics (e.g., turgor loss point, capacitance, osmotic potential) with automated turgor loss detection, built-in plotting, and optional outlier detection. All of the math is based on the Williams P-V Curve analyzer (none of the actual science in here is my own; this is just a tool for working with data!). I put it together for [a project I've been working on](https://github.com/jean-allen/spectral_pv_curves) but I'm hopeful that it can be helpful to you too ☺
+A lightweight python package for analyzing pressure-volume curves. `pvcurve` provides a simple, fast way to calculate common PV curve metrics (e.g., turgor loss point, capacitance, osmotic potential) with automated turgor loss detection, built-in plotting, and optional outlier detection.
+
+The underlying calculations are based on the Williams P-V Curve analyzer (see References). This package was originally developed for [a project I've been working on](https://github.com/jean-allen/spectral_pv_curves) and is shared in the hope that it can be useful to other folks too. ☺
 
 ## Installation
 
-Install directly from GitHub:
+Install from PyPI:
+
+```bash
+pip install pvcurve
+```
+
+Or install directly from GitHub:
 ```bash
 pip install git+https://github.com/jean-allen/pvcurve
 ```
@@ -22,20 +30,20 @@ my_pv_curve.plot()
 
 ![Example output of my_pv_curve.plot()](https://github.com/jean-allen/pvcurve/blob/main/tests/output_img.png?raw=true)
 
-Some example data is available under tests/eugl_1.xlsx, plus a notebook (reading_in_file.ipynb) that shows the same use cases seen here in a bit of a more interactive way.
+Example data is available under `tests/eugl_1.xlsx`, along with a notebook (`reading_in_file.ipynb`) that walks through the use cases seen below in a more interactive format
 
-There's also a data collection excel sheet available under templates/data_collection_template.xlsx -- if this code won't read your data sheet automatically, the fastest solution is probably to copy and paste your data into that collection spreadsheet and just read that instead. (Also consider raising an issue to let me know!)
+A data collection template is also available at `templates/data_collection_template.xlsx`. If `pvcurve` has trouble reading your data sheet automatically, the fastest solution is probably to copy your data into that spreadsheet. (Also consider [opening an issue](https://github.com/jean-allen/pvcurve/issues) to let me know what issue you're having!)
 
 ## Reading data
 
-pvcurve is designed to parse your files automatically and should be able to interpret csv and excel files, so long as the column keys are in the first row of the spreadsheet:
+`pvcurve` is designed to parse files automatically and should be able to interpret both CSV and Excel files, so long as the column keys are in the first row of the spreadsheet:
 
 ```python
 import pvcurve as pvc
 my_pv_curve = pvc.read('my_data.csv')
 ```
 
-Which column contains your Ψ/mass/dry mass data will be inferred automatically by default, but if it's throwing an error or picking up the wrong column, you can specify which column contains what data explicitly:
+Column mapping (matching columns to Ψ/mass/dry mass data) is inferred automatically by default. If this process fails or picks up the wrong column, you can specify what column contains what explicitly:
 
 ```python
 my_pv_curve = pvc.read(
@@ -46,7 +54,7 @@ my_pv_curve = pvc.read(
 )
 ```
 
-Similarly, units will be inferred automatically from the column names when possible but can also be specified:
+Similarly, units will be inferred from the column names when possible but can also be specified explicitly:
 
 ```python
 my_pv_curve = pvc.read(
@@ -59,25 +67,22 @@ my_pv_curve = pvc.read(
 )
 ```
 
-The breakpoint for pre-TLP and post-TLP is detected automatically based on the weighted R² of the before/after TLP regressions (same as the Williams P-V Analyzer, just a little more automated). You can visualize the breakpoint selection and how it affects your results by calling the `get_breakpoint` function:
+The breakpoint for what data is considered to be "pre-TLP" and "post-TLP" is detected automatically based on the weighted R² of the before/after TLP regressions (same as the Williams P-V Analyzer, just a little more automated). You can visualize the breakpoint selection and how it affects your results by calling the `get_breakpoint` function:
 
 ```python
 breakpoint = my_pv_curve.get_breakpoint(plot=True)
 ```
 ![Example output of my_pv_curve.get_breakpoint(plot=True)](https://github.com/jean-allen/pvcurve/blob/main/tests/breakpoint.png?raw=true)
 
-
-I've been thinking about experimenting with other breakpoint detection algorithms so let me know if there's something you think I should try!
-
 ## Outlier detection and removal
 
-This is a bit more experimental, but if you have a lot of curves with significant transcription errors, you can automate some of your data cleaning using either of the two outlier detection algorithms I implemented. The default method is to identify outliers based on a confidence interval around the before/after TLP regressions (by default using a 95% confidence interval, as below):
+For datasets with significant transcription errors or noisy measurements, `pvcurve` includes two automated outlier detection algorithms for you to experiment with. The default method identifies outliers based on a confidence interval around the before/after TLP regressions (by default using a 95% confidence interval, as below):
 
 ```python
 pv_clean = pv.remove_outliers(method="regression")
 ```
 
-The second method detects points that deviate strongly from the local median, calculated using a moving window, for both Ψ and wet mass. It is less prone to false positives, but I've tested it under fewer use cases, so use cautiously:
+A secondary, somewhat experimental method detects points that deviate strongly from the local median, calculated using a moving window, for both Ψ and wet mass. This approach is less prone to false positives, but has been less extensively tested, so use only with appropriate caution:
 
 ```python
 pv_clean = pv.remove_outliers(method="local_mad")
@@ -85,7 +90,7 @@ pv_clean = pv.remove_outliers(method="local_mad")
 
 ## Calculating values and visualizing output
 
-All derived values (e.g., TLP) are calculated when you create your PVCurve object and are stored as attributes. E.g.,:
+All derived metrics (e.g., TLP) are calculated when the `PVCurve` object is created and  stored as attributes:
 
 ```python
 print('Turgor Loss Point (MPa):', my_pv_curve.tlp)
@@ -94,7 +99,7 @@ print('Saturated Water Content:', my_pv_curve.swc)
 print('Bulk elastic modulus (MPa):', my_pv_curve.bulk_elastic_total)
 ```
 
-You can plot your data quickly by calling the `plot` function:
+Plotting is available using the `plot` function:
 
 ```python
 my_pv_curve.plot()
@@ -102,7 +107,7 @@ my_pv_curve.plot()
 
 ## Saving data
 
-You can save out your data and all of the calculated values to either a csv or an excel sheet:
+Results and all calculated values can be exported to CSV or Excel
 
 ```python
 my_pv_curve.save_csv("results.csv")
@@ -111,7 +116,7 @@ my_pv_curve.save_excel("results.xlsx")
 
 ## References
 
-This is just a software package; all of the actual science happened in these papers and should be credited to these people (and many others):
+The science underlying this package is drawn from the following works:
 
 Bartlett, M.K., Scoffoni, C., Sack, L. (2012). The determinants of leaf turgor loss point and prediction of drought tolerance of species and biomes: a global meta-analysis. Ecology Letters 15: 393-405. https://doi.org/10.1111/j.1461-0248.2012.01751.x
 
